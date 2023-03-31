@@ -2,6 +2,8 @@
 Attempting the Kaggle "Spaceship-Titanic" competition
 
 Current best Score/Position:
+![image](https://user-images.githubusercontent.com/86370763/228997415-84386a33-ef48-4866-9a85-0096ea316488.jpeg)
+
 ![image](https://user-images.githubusercontent.com/86370763/228939157-b3acba19-523b-4242-8038-1736255645ab.jpeg)
 
 Previous:
