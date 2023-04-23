@@ -6,7 +6,7 @@ Attempting the Kaggle "Spaceship-Titanic" competition
 
 The current scores have all been achieved using "traditional" ML approaches. Specifically boosted trees and random forests yielded the best results. Using neural networks, the score can likely be improved upon further. However, I first want to explore the possibility of more feature engineering and possible outlier effects.
 
-Current best Score/Position (out of 2372 teams):
+Highest Score/Position achieved until now (out of 2372 teams):
 ![image](https://user-images.githubusercontent.com/86370763/228939157-b3acba19-523b-4242-8038-1736255645ab.jpeg)
 
 Previous:
