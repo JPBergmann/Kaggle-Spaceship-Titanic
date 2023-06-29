@@ -2,9 +2,9 @@
 __pycache__
 .ipynb_checkpoints
 .vscode
-DATA/*
-Predictions/*
-catboost_info/*
+DATA/
+Predictions/
+catboost_info/
 nn_Xtrain_representations.csv
 nn_Xval_representations.csv
 X_test.csv
