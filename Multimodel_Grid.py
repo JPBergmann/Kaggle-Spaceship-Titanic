@@ -37,54 +37,64 @@ def save_df(data, location):
 
 def create_features(dataframe):
     """
-    Creates new features from the existing ones.
-    Some features are inspired and/or taken from the following notebook: https://www.kaggle.com/code/vladisov/spaceship-titanic-using-fast-ai
+    Function that creates new features from the existing features in the "Spaceship Titanic" training dataset.
+    Partially inspired and adapted from: https://www.kaggle.com/code/vladisov/spaceship-titanic-using-fast-ai
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+        Dataframe to create new features for.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        Dataframe with new features added.
     """
 
     df = dataframe.copy()
 
     # Numerical feature creation/transformation
-    df['LogRoomService'] = np.log1p(df['RoomService'])
-    df['LogFoodCourt'] = np.log1p(df['FoodCourt'])
-    df['LogShoppingMall'] = np.log1p(df['ShoppingMall'])
-    df['LogSpa'] = np.log1p(df['Spa'])
-    df['LogVRDeck'] = np.log1p(df['VRDeck'])
-    
-    df.loc[(df['LogRoomService'].isna()) & (df['CryoSleep'] == True), 'LogRoomService'] = 0.0
-    df.loc[(df['LogFoodCourt'].isna()) & (df['CryoSleep'] == True), 'LogFoodCourt'] = 0.0
-    df.loc[(df['LogShoppingMall'].isna()) & (df['CryoSleep'] == True), 'LogShoppingMall'] = 0.0
-    df.loc[(df['LogSpa'].isna()) & (df['CryoSleep'] == True), 'LogSpa'] = 0.0
-    df.loc[(df['LogVRDeck'].isna()) & (df['CryoSleep'] == True), 'LogVRDeck'] = 0.0
+    df["LogRoomService"] = np.log1p(df["RoomService"])
+    df["LogFoodCourt"] = np.log1p(df["FoodCourt"])
+    df["LogShoppingMall"] = np.log1p(df["ShoppingMall"])
+    df["LogSpa"] = np.log1p(df["Spa"])
+    df["LogVRDeck"] = np.log1p(df["VRDeck"])
 
-    df.loc[(df['RoomService'].isna()) & (df['CryoSleep'] == True), 'RoomService'] = 0.0
-    df.loc[(df['FoodCourt'].isna()) & (df['CryoSleep'] == True), 'FoodCourt'] = 0.0
-    df.loc[(df['ShoppingMall'].isna()) & (df['CryoSleep'] == True), 'ShoppingMall'] = 0.0
-    df.loc[(df['Spa'].isna()) & (df['CryoSleep'] == True), 'Spa'] = 0.0
-    df.loc[(df['VRDeck'].isna()) & (df['CryoSleep'] == True), 'VRDeck'] = 0.0
-    
-    df['LogTotalSpend'] = df['LogRoomService'] + df['LogFoodCourt'] + df['LogShoppingMall'] + df['LogSpa'] + df['LogVRDeck']
-    df['TotalSpent'] = df['RoomService'] + df['FoodCourt'] + df['ShoppingMall'] + df['Spa'] + df['VRDeck']
-    df['NoSpending'] = (df['TotalSpent'] == 0).astype(str)
+    df.loc[(df["LogRoomService"].isna()) & (df["CryoSleep"] == True), "LogRoomService"] = 0.0
+    df.loc[(df["LogFoodCourt"].isna()) & (df["CryoSleep"] == True), "LogFoodCourt"] = 0.0
+    df.loc[(df["LogShoppingMall"].isna()) & (df["CryoSleep"] == True), "LogShoppingMall"] = 0.0
+    df.loc[(df["LogSpa"].isna()) & (df["CryoSleep"] == True), "LogSpa"] = 0.0
+    df.loc[(df["LogVRDeck"].isna()) & (df["CryoSleep"] == True), "LogVRDeck"] = 0.0
+
+    df.loc[(df["RoomService"].isna()) & (df["CryoSleep"] == True), "RoomService"] = 0.0
+    df.loc[(df["FoodCourt"].isna()) & (df["CryoSleep"] == True), "FoodCourt"] = 0.0
+    df.loc[(df["ShoppingMall"].isna()) & (df["CryoSleep"] == True), "ShoppingMall"] = 0.0
+    df.loc[(df["Spa"].isna()) & (df["CryoSleep"] == True), "Spa"] = 0.0
+    df.loc[(df["VRDeck"].isna()) & (df["CryoSleep"] == True), "VRDeck"] = 0.0
+
+    df["LogTotalSpend"] = (df["LogRoomService"] + df["LogFoodCourt"] + df["LogShoppingMall"] + df["LogSpa"] + df["LogVRDeck"])
+    df["TotalSpent"] = (df["RoomService"] + df["FoodCourt"] + df["ShoppingMall"] + df["Spa"] + df["VRDeck"])
+    df["NoSpending"] = (df["TotalSpent"] == 0).astype(str)
 
     # Cabin Features
     df[["Cabin_Deck", "Cabin_Num", "Cabin_Side"]] = df["Cabin"].str.split("/", expand=True)
-    df['Cabin_Size'] = df.groupby('Cabin')['Cabin'].transform('count')
-    
+    df["Cabin_Size"] = df.groupby("Cabin")["Cabin"].transform("count")
+
     # Age Groups (String)
-    age_bins = [0, 2, 12, 18, 26, 39, 59, df["Age"].max()] 
-    age_labels = ['Infant', 'Child', 'Teenager', 'Young Adult', 'Adult', 'Middle Aged', 'Senior']
+    age_bins = [0, 2, 12, 18, 26, 39, 59, df["Age"].max()]
+    age_labels = ["Infant", "Child", "Teenager", "Young Adult", "Adult", "Middle Aged", "Senior"]
     df["Age_Group"] = pd.cut(df["Age"], bins=age_bins, labels=age_labels, include_lowest=True).astype(str)
 
     # Passenger Groups
-    df['PassengerGroup'] = df['PassengerId'].str.split('_', expand=True)[0]
-    df['GroupSize'] = df.groupby('PassengerGroup')['PassengerGroup'].transform('count')
+    df["PassengerGroup"] = df["PassengerId"].str.split("_", expand=True)[0]
+    df["GroupSize"] = df.groupby("PassengerGroup")["PassengerGroup"].transform("count")
 
     # NA's
-    df.loc[(df['CryoSleep'].isna()) & (df['TotalSpent'] > 0), 'CryoSleep'] = False # Cant spend money if you are in cryosleep
-    df.loc[(df['CryoSleep'].isna()) & (df['TotalSpent'] == 0), 'CryoSleep'] = True # If you haven't spent money you are in cryosleep
-    
-    df.loc[(df['HomePlanet'].isna()) & (df['Cabin_Deck'] == 'G'), 'HomePlanet'] = 'Earth'
-    df.loc[(df['HomePlanet'].isna()) & (df['Cabin_Deck'].isin(['A', 'B', 'C', 'T'])), 'HomePlanet'] = 'Europa'
+    df.loc[(df["CryoSleep"].isna()) & (df["TotalSpent"] > 0), "CryoSleep"] = False  # Cant spend money if you are in cryosleep
+    df.loc[(df["CryoSleep"].isna()) & (df["TotalSpent"] == 0), "CryoSleep"] = True  # If you haven't spent money you are very likely in cryosleep
+
+    df.loc[(df["HomePlanet"].isna()) & (df["Cabin_Deck"] == "G"), "HomePlanet"] = "Earth" # All G deck passengers are from Earth (see EDA)
+    df.loc[(df["HomePlanet"].isna()) & (df["Cabin_Deck"].isin(["B", "A", "C", "T"])), "HomePlanet"] = "Europa" # All B, A, C, T deck passengers are from Europa (see EDA)
 
     df = df.drop(columns=["Cabin", "PassengerId", "Name", "Age", "PassengerGroup", "Cabin_Num"])
 
